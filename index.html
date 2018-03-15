@@ -1,0 +1,108 @@
+<html lang="en">
+<head>
+<link rel="stylesheet" href="{{ 'css/bootstrap.css'|staticfile }}">
+<meta charset="utf-8">
+<title>Blockchan</title>
+<body style="background-color: lightcyan">
+<div align="right" id="topmenu">
+<a href="">[<span class="glyphicon glyphicon-home"></span> Home]</a>
+<a href="">[<span class="glyphicon glyphicon-wrench"></span> Settings]</a>
+<a href="">[<span class="glyphicon glyphicon-signal"></span> Connection Status]</a>
+</div>
+
+
+<div align="center" class="page-header">
+<h1><img src="{{ 'img/kamina.png'|staticfile }}" width="75" height="70" alt=""/><b>Kamina</b></h1>
+<hr size="10">
+<h3>&nbsp;&nbsp;&nbsp;&nbsp;<a id="snth" href="javascript:new_thread()" data-bind="true">[<span class="glyphicon glyphicon-pencil"></span> Start New Thread]</a></h3>
+</div>
+<script>
+var th_open = 0
+function new_thread(){
+	if(th_open == 0){
+		th_open = 1
+		document.getElementById("snth").innerHTML = '[<span class="glyphicon glyphicon-remove"></span>Close]';
+		document.getElementById("new_post").style.display = "block";
+	}
+	else{
+		th_open = 0
+		document.getElementById("snth").innerHTML = '[<span class="glyphicon glyphicon-pencil"></span> Start New Thread]';
+		document.getElementById("new_post").style.display = "none";
+	}
+}
+</script>
+
+
+<div align="center" id="new_post" style="display: none">
+<form action="BackEnd.new_post" class="col-lg-12" id="form" data-bind=true><br>
+File:<input type="file" name="file" id="file"><br>
+Subject: <input type="text" name="subject"><br>
+Comment: <textarea name="comment" form="form" rows="5" cols="40">Write something...</textarea><br>
+<input type="submit" value="Submit" id="form_submit"><br>
+</form>
+</div>
+
+
+<a id="s_bar" href="javascript:s_menu()" data-bind="true">&nbsp;[<span class="glyphicon glyphicon-search"></span>Search]</a><br>
+<div class="well well-sm" align="left" id="post_search" style="display: none;">
+&nbsp;<a href=""><span class="glyphicon glyphicon-search"></span></a>
+<input type="text" name="search_q" size="12" placeholder="Search Posts">&nbsp;
+<a href="">[<span class="glyphicon glyphicon-folder-open"></span> Archive]</a>
+</div>
+<script>
+	var menu_open = 0
+function s_menu(){
+	if(menu_open == 0){
+		document.getElementById("post_search").style.display = 'block';
+		document.getElementById("s_bar").innerHTML = '&nbsp;[<span class="glyphicon glyphicon-remove"></span>Close]';
+		menu_open = 1
+	}
+	else{
+		document.getElementById("post_search").style.display = 'none';
+		document.getElementById("s_bar").innerHTML = '&nbsp;[<span class="glyphicon glyphicon-search"></span>Search]';
+		menu_open = 0
+	}
+}
+</script>
+<div align="left" id="posts">
+<script>
+function render_posts(j_text,page,pages){
+	data = JSON.parse(j_text);
+	data.foreach(function(currentValue){
+		timestamp = currentValue.c_timestamp
+		author_id = currentValue.author_id
+		subject = currentValue.subject
+		img_blob = currentValue.image
+		text = currentValue.text
+		document.writeln(`
+		<div class="container">
+        <div class="panel panel-default">
+        <div class="panel-heading">${subject} &nbsp&nbsp&nbsp Timestamp: ${timestamp} &nbsp&nbsp&nbsp Author:${author_id}</div>
+        <div class="panel-body"><img id="image" src="" /> &nbsp ${text}</div>
+        </div>
+        </div>
+        `);
+		comments.foreach(function(currentValue2){
+		timestamp = currentValue2.c_timestamp
+		author_id = currentValue2.author_id
+		img_blob = currentValue2.image
+		text = currentValue2.text
+		document.writeln(`&nbsp&nbsp
+		<div class="container">
+        <div class="panel panel-default">
+        <div class="panel-heading">Timestamp: ${timestamp} &nbsp&nbsp&nbsp Author:${author_id}</div>
+        <div class="panel-body"><img id="image" src="" /> &nbsp ${text}</div>
+        </div>
+        </div>
+        `);
+		})
+
+	})
+}
+</script>
+</div>
+
+
+
+</body>
+</html>
