@@ -19,19 +19,7 @@ class BackEnd(htmlPy.Object):
         super(BackEnd, self).__init__()
         self.app = app
 
-    @htmlPy.Slot()
-    def say_hello_world(self):
-        self.app.html = u"Hello, world"
 
-    @htmlPy.Slot()
-    def nth_button(self):
-        self.app.evaluate_javascript("new_thread()")
-        print('Opening new thread menu')
-
-    @htmlPy.Slot()
-    def smn_button(self):
-        self.app.evaluate_javascript("s_menu()")
-        print('Opening search menu')
 
     @htmlPy.Slot(str, result=str)
     def new_post(self,data):
@@ -45,3 +33,6 @@ class BackEnd(htmlPy.Object):
         p_file.write(post)
         p_file.close()
         print('Post '+post_id+' written successfully')
+        self.app.evaluate_javascript('alert("Post created successfully")')
+        self.app.evaluate_javascript('document.getElementById("form").reset();')
+        self.app.evaluate_javascript('new_thread()')
