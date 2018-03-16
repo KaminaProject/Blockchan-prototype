@@ -9,7 +9,7 @@
 <a href="">[<span class="glyphicon glyphicon-wrench"></span> Settings]</a>
 <a href="">[<span class="glyphicon glyphicon-signal"></span> Connection Status]</a>
 </div>
-
+<hr size="10">
 
 <div align="center" class="page-header">
 <h1><img src="{{ 'img/kamina.png'|staticfile }}" width="75" height="70" alt=""/><b>Kamina</b></h1>
@@ -49,6 +49,7 @@ Comment: <textarea name="comment" form="form" rows="5" cols="40">Write something
 <input type="text" name="search_q" size="12" placeholder="Search Posts">&nbsp;
 <a href="">[<span class="glyphicon glyphicon-folder-open"></span> Archive]</a>
 </div>
+<hr size="10">
 <script>
 	var menu_open = 0
 function s_menu(){
@@ -65,7 +66,9 @@ function s_menu(){
 }
 </script>
 <div align="left" id="posts">
+	<br><br><br>
 <!--THIS PART WILL PROBABLY NEED TO BE OVERHAULED. I HAVE NEVER TESTED IT AND IT PROBABLY DOESNT WORK AT ALL-->
+<center><h1><a href="BackEnd.load_posts" data-bind="true">No posts :/</h1></a></center>
 <script>
 function render_posts(j_text,page,pages){
 	data = JSON.parse(j_text);

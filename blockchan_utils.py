@@ -37,6 +37,7 @@ def make_hash(*args):
 def get_timestamp():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+
 def get_user_id():
     regkey = regkey_value("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion","ProductId")
     ip = json.loads(urlopen('https://api.ipify.org?format=json').read().decode("utf-8"))['ip']
