@@ -5,6 +5,18 @@ import hashlib
 import winreg
 import codecs
 from urllib.request import urlopen
+import sqlite3
+import os
+
+with open("config.json","r") as config:
+    database = json.loads(config.read())[database]
+    if os.path.isfile(database):
+        conn = sqlite3.connect(database)
+        db = conn.cursor()
+    else:
+        conn = sqlite3.connect(database)
+        db = conn.cursor()
+        db.execute("CREATE TABLE posts (id,timestamp,subject,comment,image)")
 
 
 def regkey_value(path, name="", start_key = None):
@@ -43,14 +55,16 @@ def get_user_id():
     ip = json.loads(urlopen('https://api.ipify.org?format=json').read().decode("utf-8"))['ip']
     return make_hash(regkey_value,ip)
 
-
-
 class blockchan():
 
-    def pack_post(subject,comment,file,user_id):
-        with open(file,"rb") as image:
+    def encode_image(path):
+        with open(path,"rb") as image:
             image = base64.b64encode(image.read())
         image = image.decode("utf-8")
+        return image
+
+    def pack_post(subject,comment,file,user_id):
+        image = blockchan.encode_image(file)
         timestamp = str(get_timestamp())
         author_id = user_id
         post_id = make_hash(author_id,timestamp)
@@ -62,5 +76,18 @@ class blockchan():
         "comment" : comment,
         "image" : image
         }
-        post = json.dumps(post)
-        return post
+        return json.dumps(post)
+
+
+    def save_post(post):
+        post = json.loads(post)
+        post_id = post['post_id']
+        timestamp = post['timestamp']
+        subject = post['subject']
+        comment = post['comment']
+        image = post['image']
+        if db.execute("INSERT INTO posts (id,timestamp,subject,comment,image) VALUES(?,?,?,?,?)",(post_id,timestamp,subject,comment,image)):
+            conn.commit()
+            return 1
+        else:
+            return 0
