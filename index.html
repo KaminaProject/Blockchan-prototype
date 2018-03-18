@@ -1,6 +1,8 @@
 <html lang="en">
 <head>
 <link rel="stylesheet" href="{{ 'css/bootstrap.css'|staticfile }}">
+<script src="{{ 'js/jquery-3.3.1'|staticfile }}"></script>
+<link rel="stylesheet" href="static/css/bootstrap.css">
 <meta charset="utf-8">
 <title>Blockchan</title>
 <body style="background-color: lightcyan">
@@ -30,8 +32,21 @@ function new_thread(){
 		document.getElementById("new_post").style.display = "none";
 	}
 }
-</script>
+function render_post(j_text){
+	data = JSON.parse(j_text);
+	document.getElementById("posts").innerHTML = ''
+	for(var post in data){
+		timestamp = data[post].timestamp;
+		post_id = data[post].post_id;
+		subject = data[post].subject;
+		img_blob = data[post].image;
+		text = data[post].comment;
+		document.getElementById("posts").innerHTML = document.getElementById("posts").innerHTML +"<br>"+'</left><div class="container"><div class="panel panel-default"><div class="panel-heading"><a style="color:green">Anonymous</a> &nbsp&nbsp&nbsp Timestamp: '+timestamp+' &nbsp&nbsp&nbsp ID:'+post_id+'</div><div class="panel-body"><img src="data:image/png;base64, '+img_blob+' width="128" height="128" /> &nbsp '+text+'</div></div></div></left>'
 
+		}
+}
+
+</script>
 
 <div align="center" id="new_post" style="display: none">
 <form action="BackEnd.new_post" class="col-lg-12" id="form" data-bind=true><br>
@@ -67,46 +82,13 @@ function s_menu(){
 </script>
 <div align="left" id="posts">
 	<br><br><br>
-<!--THIS PART WILL PROBABLY NEED TO BE OVERHAULED. I HAVE NEVER TESTED IT AND IT PROBABLY DOESNT WORK AT ALL-->
-<center><h1><a href="BackEnd.load_posts" data-bind="true">No posts :/</h1></a></center>
 <script>
-function render_posts(j_text,page,pages){
-	data = JSON.parse(j_text);
-	data.foreach(function(currentValue){
-		timestamp = currentValue.c_timestamp
-		author_id = currentValue.author_id
-		subject = currentValue.subject
-		img_blob = currentValue.image
-		text = currentValue.text
-		document.writeln(`
-		<div class="container">
-        <div class="panel panel-default">
-        <div class="panel-heading">${subject} &nbsp&nbsp&nbsp Timestamp: ${timestamp} &nbsp&nbsp&nbsp Author:${author_id}</div>
-        <div class="panel-body"><img id="image" src="" /> &nbsp ${text}</div>
-        </div>
-        </div>
-        `);
-		comments.foreach(function(currentValue2){
-		timestamp = currentValue2.c_timestamp
-		author_id = currentValue2.author_id
-		img_blob = currentValue2.image
-		text = currentValue2.text
-		document.writeln(`&nbsp&nbsp
-		<div class="container">
-        <div class="panel panel-default">
-        <div class="panel-heading">Timestamp: ${timestamp} &nbsp&nbsp&nbsp Author:${author_id}</div>
-        <div class="panel-body"><img id="image" src="" /> &nbsp ${text}</div>
-        </div>
-        </div>
-        `);
-		})
-
-	})
-}
+$(document).ready(function(){
+	location.href = 'BackEnd.load_posts';
+})
 </script>
+<center><h1><a href="BackEnd.load_posts" data-bind="true">No posts :/</h1></a></center>
 </div>
-
-
 
 </body>
 </html>

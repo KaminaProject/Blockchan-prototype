@@ -9,6 +9,7 @@ with open('config.json',"r+") as conf_file:
         user_id = blockchan_utils.get_user_id()
         config['user_id'] = user_id
         conf_file.truncate(0)
+        conf_file.seek(0)
         conf_file.write(json.dumps(config))
         conf_file.close()
     else:
@@ -29,8 +30,8 @@ class BackEnd(htmlPy.Object):
         subject = data['subject']
         comment = data['comment']
         file = data['file']
-        post = blockchan.pack_post(subject,comment,file,user_id)
-        post_id = json.loads(post)['post_id']
+        post = blockchan.prepare_post(subject,comment,file,user_id)
+        post_id = post['post_id']
         if blockchan.save_post(post):
             print('Post '+post_id+' written successfully')
             self.app.evaluate_javascript('alert("Post created successfully")')
@@ -41,6 +42,18 @@ class BackEnd(htmlPy.Object):
 
 
     @htmlPy.Slot()
-    def load_posts():
-        with open("data/posts.json""r") as posts_file:
-            posts = json.loads(posts_file.read())
+    def load_posts(self):
+        tbr_posts = []
+        posts = blockchan.load_all_posts()
+        for post in posts:
+            post = {
+            "post_id" : post[0],
+            "timestamp" : post[1],
+            "subject" : post[2],
+            "comment" : post[3],
+            "image" : post[4]
+            }
+            tbr_posts.append(post)
+        tbr_posts = blockchan.pack_json(tbr_posts)
+        print('Rendering posts...')
+        self.app.evaluate_javascript("render_post('{}')".format(tbr_posts))

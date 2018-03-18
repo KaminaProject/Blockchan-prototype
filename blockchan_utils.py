@@ -9,7 +9,7 @@ import sqlite3
 import os
 
 with open("config.json","r") as config:
-    database = json.loads(config.read())[database]
+    database = json.loads(config.read())['database']
     if os.path.isfile(database):
         conn = sqlite3.connect(database)
         db = conn.cursor()
@@ -63,11 +63,12 @@ class blockchan():
         image = image.decode("utf-8")
         return image
 
-    def pack_post(subject,comment,file,user_id):
+    def prepare_post(subject,comment,file,user_id,post_id=0):
         image = blockchan.encode_image(file)
         timestamp = str(get_timestamp())
         author_id = user_id
-        post_id = make_hash(author_id,timestamp)
+        if post_id == 0:
+            post_id = make_hash(timestamp,author_id)
         post = {
         "post_id" : post_id,
         "author" : author_id,
@@ -76,11 +77,13 @@ class blockchan():
         "comment" : comment,
         "image" : image
         }
+        return post
+
+    def pack_json(post):
         return json.dumps(post)
 
 
     def save_post(post):
-        post = json.loads(post)
         post_id = post['post_id']
         timestamp = post['timestamp']
         subject = post['subject']
@@ -91,3 +94,7 @@ class blockchan():
             return 1
         else:
             return 0
+
+    def load_all_posts():
+        db.execute("SELECT id,timestamp,subject,comment,image FROM posts ORDER BY timestamp DESC")
+        return db.fetchall()
