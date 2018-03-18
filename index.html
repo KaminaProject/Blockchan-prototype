@@ -1,7 +1,8 @@
 <html lang="en">
 <head>
+<link rel="stylesheet" href="{{ 'css/style.css'|staticfile }}">
 <link rel="stylesheet" href="{{ 'css/bootstrap.css'|staticfile }}">
-<script src="{{ 'js/jquery-3.3.1'|staticfile }}"></script>
+<script src="{{ 'js/blockchan.js'|staticfile }}"></script>
 <link rel="stylesheet" href="static/css/bootstrap.css">
 <meta charset="utf-8">
 <title>Blockchan</title>
@@ -18,35 +19,6 @@
 <hr size="10">
 <h3>&nbsp;&nbsp;&nbsp;&nbsp;<a id="snth" href="javascript:new_thread()" data-bind="true">[<span class="glyphicon glyphicon-pencil"></span> Start New Thread]</a></h3>
 </div>
-<script>
-var th_open = 0
-function new_thread(){
-	if(th_open == 0){
-		th_open = 1
-		document.getElementById("snth").innerHTML = '[<span class="glyphicon glyphicon-remove"></span>Close]';
-		document.getElementById("new_post").style.display = "block";
-	}
-	else{
-		th_open = 0
-		document.getElementById("snth").innerHTML = '[<span class="glyphicon glyphicon-pencil"></span> Start New Thread]';
-		document.getElementById("new_post").style.display = "none";
-	}
-}
-function render_post(j_text){
-	data = JSON.parse(j_text);
-	document.getElementById("posts").innerHTML = ''
-	for(var post in data){
-		timestamp = data[post].timestamp;
-		post_id = data[post].post_id;
-		subject = data[post].subject;
-		img_blob = data[post].image;
-		text = data[post].comment;
-		document.getElementById("posts").innerHTML = document.getElementById("posts").innerHTML +"<br>"+'</left><div class="container"><div class="panel panel-default"><div class="panel-heading"><a style="color:green">Anonymous</a> &nbsp&nbsp&nbsp Timestamp: '+timestamp+' &nbsp&nbsp&nbsp ID:'+post_id+'</div><div class="panel-body"><img src="data:image/png;base64, '+img_blob+' width="128" height="128" /> &nbsp '+text+'</div></div></div></left>'
-
-		}
-}
-
-</script>
 
 <div align="center" id="new_post" style="display: none">
 <form action="BackEnd.new_post" class="col-lg-12" id="form" data-bind=true><br>
@@ -65,30 +37,13 @@ Comment: <textarea name="comment" form="form" rows="5" cols="40">Write something
 <a href="">[<span class="glyphicon glyphicon-folder-open"></span> Archive]</a>
 </div>
 <hr size="10">
-<script>
-	var menu_open = 0
-function s_menu(){
-	if(menu_open == 0){
-		document.getElementById("post_search").style.display = 'block';
-		document.getElementById("s_bar").innerHTML = '&nbsp;[<span class="glyphicon glyphicon-remove"></span>Close]';
-		menu_open = 1
-	}
-	else{
-		document.getElementById("post_search").style.display = 'none';
-		document.getElementById("s_bar").innerHTML = '&nbsp;[<span class="glyphicon glyphicon-search"></span>Search]';
-		menu_open = 0
-	}
-}
-</script>
 <div align="left" id="posts">
 	<br><br><br>
-<script>
-$(document).ready(function(){
-	location.href = 'BackEnd.load_posts';
-})
-</script>
+
 <center><h1><a href="BackEnd.load_posts" data-bind="true">No posts :/</h1></a></center>
 </div>
+
+
 
 </body>
 </html>
