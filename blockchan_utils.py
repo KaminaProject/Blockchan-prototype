@@ -16,7 +16,7 @@ with open("config.json","r") as config:
     else:
         conn = sqlite3.connect(database)
         db = conn.cursor()
-        db.execute("CREATE TABLE posts (id,timestamp,subject,comment,image)")
+        db.execute("CREATE TABLE posts (thread,id,timestamp,subject,comment,image)")
 
 
 def regkey_value(path, name="", start_key = None):
@@ -69,7 +69,7 @@ class Post():
         comment = self.comment
         image = self.image
         timestamp = self.timestamp
-        if db.execute("INSERT INTO posts (id,timestamp,subject,comment,image) VALUES(?,?,?,?,?)",(id,timestamp,subject,comment,image)):
+        if db.execute("INSERT INTO posts (thread,id,timestamp,subject,comment,image) VALUES(0,?,?,?,?,?)",(id,timestamp,subject,comment,image)):
             conn.commit()
             return 1
         else:
@@ -112,7 +112,7 @@ class blockchan():
         image = image.decode("utf-8")
         return image
 
-    def make_post(subject,comment,file,user_id,post_id=0):
+    def make_post(subject,comment,file,user_id,post_id=0,thread=0):
         image = blockchan.encode_image(file)
         timestamp = str(get_timestamp())
         author_id = user_id
