@@ -20,7 +20,7 @@ function render_post(j_text){
 		subject = data[post].subject;
 		img_blob = data[post].image;
 		text = data[post].comment;
-		document.getElementById("posts").innerHTML = document.getElementById("posts").innerHTML +"<br>"+'</left><div class="container"><div class="panel panel-default"><div class="panel-heading"><a style="color:green">Anonymous</a> &nbsp&nbsp&nbsp Timestamp: '+timestamp+' &nbsp&nbsp&nbsp ID:'+post_id+'</div><div class="panel-body"><a href="javascript:big_image('+post_id+')"><img id="'+post_id+'"src="data:image/png;base64, '+img_blob+' height="200px" width="200px" border="1px"/></a>&nbsp'+text+'</div></div></div></left>'
+		document.getElementById("posts").innerHTML = document.getElementById("posts").innerHTML +"<br>"+'</left><div class="container"><div class="panel panel-default"><div class="panel-heading"><a style="color:green">Anonymous</a> &nbsp&nbsp&nbsp Timestamp: '+timestamp+' &nbsp&nbsp&nbsp ID:'+post_id+'</div><div class="panel-body"><a href="javascript:big_image('+post_id+')"><img id="'+post_id+'"src="data:image/png;base64, '+img_blob+' height="200px" width="200px" border="1px"/></a>&nbsp'+text+'</div><div class="panel-footer"><right><a href="javascript:open_thread('+post_id+')" class="btn btn-default">View thread</a></right></div></div></div></left>'
 
 		}
 }
@@ -37,4 +37,8 @@ function s_menu(){
 		document.getElementById("s_bar").innerHTML = '&nbsp;[<span class="glyphicon glyphicon-search"></span>Search]';
 		menu_open = 0
 	}
+}
+
+function open_thread(pid){
+	document.getElementById("posts").innerHTML = ''
 }

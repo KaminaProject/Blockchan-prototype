@@ -55,6 +55,55 @@ def get_user_id():
     ip = json.loads(urlopen('https://api.ipify.org?format=json').read().decode("utf-8"))['ip']
     return make_hash(regkey_value,ip)
 
+class Post():
+    id = ""
+    timestamp = ""
+    subject = ""
+    comment = ""
+    image = ""
+    thread = ""
+
+    def save_post(self):
+        id = self.id
+        subject = self.subject
+        comment = self.comment
+        image = self.image
+        timestamp = self.timestamp
+        if db.execute("INSERT INTO posts (id,timestamp,subject,comment,image) VALUES(?,?,?,?,?)",(id,timestamp,subject,comment,image)):
+            conn.commit()
+            return 1
+        else:
+            return 0
+
+    def add_comment(self,comm):
+        timestamp = comm['timestamp']
+        subject = comm['subject']
+        image = comm['image']
+        post_id = self.id
+        id = make_hash(timestamp,post_id)
+        db.execute("INSERT INTO posts(thread,id,timestamp,subject,comment,image) values(?,?,?,?,?,?)",(post_id,id,timestamp,subject,comment,image))
+        conn.commit()
+
+    def get_comment_count(self):
+        db.execute("SELECT COUNT id FROM posts WHERE thread=?",(self.id,))
+        return db.fetchone()[0]
+
+    def get_comments(self):
+        comments = []
+        db.execute("SELECT id,timestamp,subject,comment,image FROM posts WHERE thread=?",(self.id,))
+        for res in db.fetchall():
+            comm = Post()
+            comm.thread = self.id
+            comm.id = res[0]
+            comm.timestamp = res[1]
+            comm.subject = res[2]
+            comm.comment = res[3]
+            comm.image = res[4]
+            comments.append(comm)
+        return comments
+
+
+
 class blockchan():
 
     def encode_image(path):
@@ -63,38 +112,50 @@ class blockchan():
         image = image.decode("utf-8")
         return image
 
-    def prepare_post(subject,comment,file,user_id,post_id=0):
+    def make_post(subject,comment,file,user_id,post_id=0):
         image = blockchan.encode_image(file)
         timestamp = str(get_timestamp())
         author_id = user_id
         if post_id == 0:
             post_id = make_hash(timestamp,author_id)
-        post = {
-        "post_id" : post_id,
-        "author" : author_id,
-        "timestamp" : timestamp,
-        "subject" : subject,
-        "comment" : comment,
-        "image" : image
-        }
+        post = Post()
+        post.id = post_id
+        post.timestamp = timestamp
+        post.subject = subject
+        post.comment = comment
+        post.image = image
         return post
 
-    def pack_json(post):
-        return json.dumps(post)
+
+    def get_all_posts():
+        db.execute("SELECT id,timestamp,subject,comment,image FROM posts ORDER BY timestamp DESC")
+        posts = []
+        for res in db.fetchall():
+            post = Post()
+            post.id = res[0]
+            post.timestamp = res[1]
+            post.subject = res[2]
+            post.comment = res[3]
+            post.image = res[4]
+            posts.append(post)
+        return posts
 
 
-    def save_post(post):
-        post_id = post['post_id']
-        timestamp = post['timestamp']
-        subject = post['subject']
-        comment = post['comment']
-        image = post['image']
-        if db.execute("INSERT INTO posts (id,timestamp,subject,comment,image) VALUES(?,?,?,?,?)",(post_id,timestamp,subject,comment,image)):
-            conn.commit()
+    def post_exists(id):
+        db.execute("SELECT id FROM posts WHERE id=?",(id,))
+        if db.fetchone():
             return 1
         else:
             return 0
 
-    def load_all_posts():
-        db.execute("SELECT id,timestamp,subject,comment,image FROM posts ORDER BY timestamp DESC")
-        return db.fetchall()
+
+    def get_post(id):
+        db.execute("SELECT id,timestamp,subject,comment,image FROM posts WHERE id=?",(id,))
+        res = db.fetchone()
+        post = Post()
+        post.id = res[0]
+        post.timestamp = res[1]
+        post.subject = res[2]
+        post.comment = res[3]
+        post.image = res[4]
+        return post
