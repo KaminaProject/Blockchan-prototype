@@ -1,49 +1,49 @@
 <html lang="en">
 <head>
-<link rel="stylesheet" href="{{ 'css/style.css'|staticfile }}">
 <link rel="stylesheet" href="{{ 'css/bootstrap.css'|staticfile }}">
+<script src="{{ 'js/jquery-3.3.1.js'|staticfile }}"></script>
+<script src="{{ 'js/jQueryRotate.js'|staticfile }}"></script>
 <script src="{{ 'js/blockchan.js'|staticfile }}"></script>
-<link rel="stylesheet" href="static/css/bootstrap.css">
 <meta charset="utf-8">
 <title>Blockchan</title>
 <body style="background-color: lightcyan">
-<div align="right" id="topmenu">
-<a href="">[<span class="glyphicon glyphicon-home"></span> Home]</a>
-<a href="">[<span class="glyphicon glyphicon-wrench"></span> Settings]</a>
-<a href="">[<span class="glyphicon glyphicon-signal"></span> Connection Status]</a>
-</div>
-<hr size="10">
 
+<div align="right" class="well well-sm" class="fixed-top">
+<button type="button" class="btn btn-primary" style="float:left;" id="topmenubutton"><span style="display:inline-block;"><img id="topmenuimage" src="{{ 'img/kamina.png'|staticfile }}" height="21px" width="32px"/></span></button>
+<div id="topmenu" style="display:none;">
+<input style="width: 15%; float:left; position: absolute; left:80px;" type="text" class="form-control" name="username" value="Anonymous" form="form">
+<a href="BackEnd.load_posts" data-bind="true"><button type="button" class="btn"><span class="glyphicon glyphicon-home"></span> Home</a></button>
+<a href=""><button type="button" class="btn"><span class="glyphicon glyphicon-wrench"></span> Settings</a></button>
+<a href=""><button type="button" class="btn"><span class="glyphicon glyphicon-signal"></span> Connection Status</a></button>
+</div>
+</div>
+<br><br>
 <div align="center" class="page-header">
-<h1><img src="{{ 'img/kamina.png'|staticfile }}" width="75" height="70" alt=""/><b>Kamina</b></h1>
-<hr size="10">
-<h3>&nbsp;&nbsp;&nbsp;&nbsp;<a id="snth" href="javascript:new_thread()" data-bind="true">[<span class="glyphicon glyphicon-pencil"></span> Start New Thread]</a></h3>
+<h1><img src="{{ 'img/kamina.png'|staticfile }}" width="90" height="60" alt=""/><b>Welcome to Kamina</b></h1><br><br>
+<button id="snth" type="button" class="btn"><span class="glyphicon glyphicon-pencil"></span> Start New Thread</button><br><br>
 </div>
 
 <div align="center" id="new_post" style="display: none">
-<form action="BackEnd.new_post" class="col-lg-12" id="form" data-bind=true><br>
-File:<input type="file" name="file" id="file"><br>
-Subject: <input type="text" name="subject"><br>
-Comment: <textarea name="comment" form="form" rows="5" cols="40">Write something...</textarea><br>
-<input type="submit" value="Submit" id="form_submit"><br>
+<form action="BackEnd.new_post" class="col-lg-12" id="form" data-bind=true>
+<div class="form-group">
+<input style="width: 30%;" type="text" class="form-control" name="subject" placeholder="Subject">
+<textarea style="width: 30%;" class="form-control" name="comment" form="form" rows="5" placeholder="What's on your mind ?"></textarea>
+Image: <input id="fileinput" type="file" name="file" style="width:500px;"><br>
+</div>
+<br>
+<button type="submit" class="btn btn-primary">Post!</button>
+</div>
+</div>
 </form>
-</div>
 
-
-<a id="s_bar" href="javascript:s_menu()" data-bind="true">&nbsp;[<span class="glyphicon glyphicon-search"></span>Search]</a><br>
-<div class="well well-sm" align="left" id="post_search" style="display: none;">
-&nbsp;<a href=""><span class="glyphicon glyphicon-search"></span></a>
-<input type="text" name="search_q" size="12" placeholder="Search Posts">&nbsp;
-<a href="">[<span class="glyphicon glyphicon-folder-open"></span> Archive]</a>
-</div>
-<hr size="10">
 <div align="left" id="posts">
-	<br><br><br>
+	<br><br><br><br><br><br><br>
 
-<center><h1><a href="BackEnd.load_posts" data-bind="true">No posts :/</h1></a></center>
+<center><h1><a id="loadposts" href="BackEnd.load_posts" data-bind="true">No posts :/</h1></a></center>
 </div>
 
 
 
 </body>
+<div id="sandbox" style="display:none;"></div>
 </html>

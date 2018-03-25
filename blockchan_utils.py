@@ -16,7 +16,7 @@ with open("config.json","r") as config:
     else:
         conn = sqlite3.connect(database)
         db = conn.cursor()
-        db.execute("CREATE TABLE posts (thread,id,timestamp,subject,comment,image)")
+        db.execute("CREATE TABLE posts (thread,author_name,id,timestamp,subject,comment,image)")
 
 
 def regkey_value(path, name="", start_key = None):
@@ -57,6 +57,7 @@ def get_user_id():
 
 class Post():
     id = ""
+    author_name = ""
     timestamp = ""
     subject = ""
     comment = ""
@@ -65,32 +66,38 @@ class Post():
 
     def save_post(self):
         id = self.id
+        author_name = self.author_name
         subject = self.subject
         comment = self.comment
         image = self.image
         timestamp = self.timestamp
-        if db.execute("INSERT INTO posts (thread,id,timestamp,subject,comment,image) VALUES(0,?,?,?,?,?)",(id,timestamp,subject,comment,image)):
+        if db.execute("INSERT INTO posts (thread,id,author_name,timestamp,subject,comment,image) VALUES(0,?,?,?,?,?,?)",(id,author_name,timestamp,subject,comment,image)):
             conn.commit()
             return 1
         else:
             return 0
 
     def add_comment(self,comm):
-        timestamp = comm['timestamp']
-        subject = comm['subject']
-        image = comm['image']
+        author_name = comm.author_name
+        timestamp = comm.timestamp
+        subject = comm.subject
+        image = comm.image
+        comment = comm.comment
         post_id = self.id
         id = make_hash(timestamp,post_id)
-        db.execute("INSERT INTO posts(thread,id,timestamp,subject,comment,image) values(?,?,?,?,?,?)",(post_id,id,timestamp,subject,comment,image))
-        conn.commit()
+        if db.execute("INSERT INTO posts(thread,author_name,id,timestamp,subject,comment,image) values(?,?,?,?,?,?,?)",(post_id,author_name,id,timestamp,subject,comment,image)):
+            conn.commit()
+            return 1
+        else:
+            return 0
 
     def get_comment_count(self):
-        db.execute("SELECT COUNT id FROM posts WHERE thread=?",(self.id,))
+        db.execute("SELECT count(*) FROM posts WHERE thread=?",(self.id,))
         return db.fetchone()[0]
 
     def get_comments(self):
         comments = []
-        db.execute("SELECT id,timestamp,subject,comment,image FROM posts WHERE thread=?",(self.id,))
+        db.execute("SELECT id,timestamp,subject,comment,image,author_name FROM posts WHERE thread=?",(self.id,))
         for res in db.fetchall():
             comm = Post()
             comm.thread = self.id
@@ -99,8 +106,31 @@ class Post():
             comm.subject = res[2]
             comm.comment = res[3]
             comm.image = res[4]
+            comm.author_name = res[5]
+            comm.replies = []
+            db.execute("SELECT id,timestamp,subject,comment,image FROM posts WHERE thread=?",(comm.id,))
+            for res2 in db.fetchall():
+                reply = Post()
+                reply.thread = self.id
+                reply.id = res[0]
+                reply.timestamp = res[1]
+                reply.subject = res[2]
+                reply.comment = res[3]
+                reply.image = res[4]
+                reply.author_name = res[5]
+                comm.replies.append(reply)
             comments.append(comm)
         return comments
+
+    def pack_json(self):
+        post = {
+        "post_id" : self.id,
+        "timestamp" : self.timestamp,
+        "comment" : self.comment,
+        "subject" : self.subject,
+        "image" : self.image
+        }
+        return json.dumps(post)
 
 
 
@@ -112,31 +142,37 @@ class blockchan():
         image = image.decode("utf-8")
         return image
 
-    def make_post(subject,comment,file,user_id,post_id=0,thread=0):
-        image = blockchan.encode_image(file)
+    def make_post(name,subject,comment,file,user_id,post_id=0,thread=0):
+        if file != '':
+            image = blockchan.encode_image(file)
+        else:
+            image = 0
         timestamp = str(get_timestamp())
         author_id = user_id
         if post_id == 0:
             post_id = make_hash(timestamp,author_id)
         post = Post()
         post.id = post_id
+        post.author_name = name
         post.timestamp = timestamp
         post.subject = subject
         post.comment = comment
         post.image = image
+        post.thread = thread
         return post
 
 
     def get_all_posts():
-        db.execute("SELECT id,timestamp,subject,comment,image FROM posts ORDER BY timestamp DESC")
+        db.execute("SELECT author_name,timestamp,subject,comment,image,id FROM posts WHERE thread=0 ORDER BY timestamp DESC")
         posts = []
         for res in db.fetchall():
             post = Post()
-            post.id = res[0]
+            post.author_name = res[0]
             post.timestamp = res[1]
             post.subject = res[2]
             post.comment = res[3]
             post.image = res[4]
+            post.id = res[5]
             posts.append(post)
         return posts
 
@@ -145,17 +181,21 @@ class blockchan():
         db.execute("SELECT id FROM posts WHERE id=?",(id,))
         if db.fetchone():
             return 1
-        else:
-            return 0
 
 
     def get_post(id):
-        db.execute("SELECT id,timestamp,subject,comment,image FROM posts WHERE id=?",(id,))
+        db.execute("SELECT id,author_name,timestamp,subject,comment,image FROM posts WHERE id=?",(id,))
         res = db.fetchone()
         post = Post()
         post.id = res[0]
-        post.timestamp = res[1]
-        post.subject = res[2]
-        post.comment = res[3]
-        post.image = res[4]
+        post.author_name = res[1]
+        post.timestamp = res[2]
+        post.subject = res[3]
+        post.comment = res[4]
+        post.image = res[5]
         return post
+
+
+    def get_post_ids():
+        db.execute("SELECT id FROM posts")
+        return db.fetchall()

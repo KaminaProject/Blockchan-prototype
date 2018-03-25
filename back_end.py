@@ -27,10 +27,23 @@ class BackEnd(htmlPy.Object):
     @htmlPy.Slot(str, result=str)
     def new_post(self,data):
         data = json.loads(data)
+        author_name = data['username']
         subject = data['subject']
         comment = data['comment']
         file = data['file']
-        post = blockchan.make_post(subject,comment,file,user_id)
+        if 'thread' in data:
+            thread = data['thread']
+            reply = blockchan.make_post(author_name,subject,comment,file,user_id)
+            if blockchan.get_post(thread).add_comment(reply):
+                print("Comment written successfully")
+                self.app.evaluate_javascript('alert("Comment written successfully")')
+                self.app.evaluate_javascript('document.getElementById("form").reset();')
+                self.app.evaluate_javascript('new_thread()')
+                return 1
+            else:
+                self.app.evaluate_javascript('alert("Something went wrong...check console")')
+                return 1
+        post = blockchan.make_post(author_name,subject,comment,file,user_id)
         post_id = post.id
         if post.save_post():
             print('Post '+post_id+' written successfully')
@@ -48,12 +61,43 @@ class BackEnd(htmlPy.Object):
         for post in posts:
             post = {
             "post_id" : post.id,
+            "author_name" : post.author_name,
             "timestamp" : post.timestamp,
             "subject" : post.subject,
             "comment" : post.comment,
-            "image" : post.image
+            "image" : post.image,
+            "comm_count": post.get_comment_count()
             }
             tbr_posts.append(post)
         tbr_posts = json.dumps(tbr_posts)
         print('Rendering posts...')
-        self.app.evaluate_javascript("render_post('{}')".format(tbr_posts))
+        self.app.evaluate_javascript("render_posts('{}')".format(tbr_posts))
+        return 1
+
+
+    @htmlPy.Slot(str, result=str)
+    def open_post(self,pid):
+        print('Opening post '+pid)
+        post = blockchan.get_post(pid)
+        comments = post.get_comments()
+        postt = {
+        "post_id" : post.id,
+        "author_name" : post.author_name,
+        "timestamp" : post.timestamp,
+        "subject" : post.subject,
+        "comment" : post.comment,
+        "image" : post.image,
+        "comments" : []
+        }
+        for comment in comments:
+            posttt = {
+            "post_id" : comment.id,
+            "author_name" : comment.author_name,
+            "timestamp" : comment.timestamp,
+            "subject" : comment.subject,
+            "comment" : comment.comment,
+            "image" : comment.image
+            }
+            postt['comments'].append(posttt)
+        self.app.evaluate_javascript("open_post('{}')".format(json.dumps(postt)))
+        print('Opening post')
