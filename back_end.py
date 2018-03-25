@@ -38,7 +38,7 @@ class BackEnd(htmlPy.Object):
                 print("Comment written successfully")
                 self.app.evaluate_javascript('alert("Comment written successfully")')
                 self.app.evaluate_javascript('document.getElementById("form").reset();')
-                self.app.evaluate_javascript('new_thread()')
+                self.app.evaluate_javascript('ready.new_thread()')
                 return 1
             else:
                 self.app.evaluate_javascript('alert("Something went wrong...check console")')
@@ -49,7 +49,7 @@ class BackEnd(htmlPy.Object):
             print('Post '+post_id+' written successfully')
             self.app.evaluate_javascript('alert("Post created successfully")')
             self.app.evaluate_javascript('document.getElementById("form").reset();')
-            self.app.evaluate_javascript('new_thread()')
+            self.app.evaluate_javascript('ready.new_thread()')
         else:
             self.app.evaluate_javascript('alert("Something went wrong...check console")')
 

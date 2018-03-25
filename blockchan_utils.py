@@ -44,7 +44,7 @@ def make_hash(*args):
         tobehashed = tobehashed+str(arg)
     tobehashed = tobehashed.encode("utf-8")
     hash_object = hashlib.sha256(tobehashed)
-    return hash_object.hexdigest()
+    return hash_object.hexdigest()[:32]
 
 def get_timestamp():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')

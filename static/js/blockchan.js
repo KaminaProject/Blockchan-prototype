@@ -35,7 +35,22 @@ var tpm_open = 0
 			}
 	});
 
+ $("#form").submit(function(){
+	 th_open = 0
+	 $("#snth").attr('class', 'btn');
+	 $("#new_post").hide();
+	 if(thread_open === 1){
+		 $("#snth").html('<span class="glyphicon glyphicon-comment"></span> Reply');
+	}
+	else{
+		$("#snth").html('<span class="glyphicon glyphicon-pencil"></span> Start New Thread');
+	}
 });
+
+});
+
+
+
 var thread_open
 	function render_posts(j_text){
 	  thread_open = 0
@@ -96,7 +111,7 @@ var thread_open
 		    '<input type="text" form="form" name="thread" value="'+post_id+'" style="display:none;">'+
 		    '<div class="container">'+
 				'<div class="card">'+
-				'<div class="card-header"><a style="color:green">'+author+'</a> &nbsp&nbsp&nbsp Timestamp: '+timestamp+' &nbsp&nbsp&nbsp Subject: '+subject+' &nbsp&nbsp&nbsp ID:'+post_id+'</div>'+
+				'<div class="card-header bg-dark text-white"><a style="color:green">'+author+'</a> Timestamp: '+timestamp+' &nbsp&nbsp&nbsp Subject: '+subject+' &nbsp&nbsp&nbsp ID:'+post_id+'</div>'+
 				'<div class="card-body" align="center"><img '+image_present+' id="image" src="data:image/png;base64, '+img_blob+' width="512" height="256" /> <br> '+text+'</div>'+
 				'</div></div><br>';
 		for(post in data.comments){
