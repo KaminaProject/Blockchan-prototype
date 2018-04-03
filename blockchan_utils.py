@@ -38,13 +38,13 @@ def regkey_value(path, name="", start_key = None):
                 i += 1
             return desc[1]
 
-def make_hash(*args):
+def make_hash(*args,length=32):
     tobehashed = ''
     for arg in args:
         tobehashed = tobehashed+str(arg)
     tobehashed = tobehashed.encode("utf-8")
     hash_object = hashlib.sha256(tobehashed)
-    return hash_object.hexdigest()[:32]
+    return hash_object.hexdigest()[:length]
 
 def get_timestamp():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')

@@ -59,19 +59,10 @@ class BackEnd(htmlPy.Object):
         tbr_posts = []
         posts = blockchan.get_all_posts()
         for post in posts:
-            post = {
-            "post_id" : post.id,
-            "author_name" : post.author_name,
-            "timestamp" : post.timestamp,
-            "subject" : post.subject,
-            "comment" : post.comment,
-            "image" : post.image,
-            "comm_count": post.get_comment_count()
-            }
-            tbr_posts.append(post)
-        tbr_posts = json.dumps(tbr_posts)
+            post.comm_count = post.get_comment_count()
         print('Rendering posts...')
-        self.app.evaluate_javascript("render_posts('{}')".format(tbr_posts))
+        self.app.evaluate_javascript('thread_open = 0')
+        self.app.template = ("index.html", {'posts':posts,'mode':'posts'})
         return 1
 
 
@@ -80,24 +71,8 @@ class BackEnd(htmlPy.Object):
         print('Opening post '+pid)
         post = blockchan.get_post(pid)
         comments = post.get_comments()
-        postt = {
-        "post_id" : post.id,
-        "author_name" : post.author_name,
-        "timestamp" : post.timestamp,
-        "subject" : post.subject,
-        "comment" : post.comment,
-        "image" : post.image,
-        "comments" : []
-        }
+        post.replies = []
         for comment in comments:
-            posttt = {
-            "post_id" : comment.id,
-            "author_name" : comment.author_name,
-            "timestamp" : comment.timestamp,
-            "subject" : comment.subject,
-            "comment" : comment.comment,
-            "image" : comment.image
-            }
-            postt['comments'].append(posttt)
-        self.app.evaluate_javascript("open_post('{}')".format(json.dumps(postt)))
-        print('Opening post')
+            post.replies.append(comment)
+        self.app.evaluate_javascript('thread_open = 1')
+        self.app.template = ("index.html", {'post':post,'mode':'singlepost'})

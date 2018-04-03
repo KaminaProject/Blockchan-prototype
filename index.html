@@ -38,10 +38,36 @@ Image: <input id="fileinput" type="file" name="file" style="width:500px;"><br>
 
 <div align="left" id="posts">
 	<br><br><br><br><br><br><br>
-
+{% if mode == 'posts' %}
+{% for post in posts %}
+	<div class="container">
+	<div class="card">
+	<div class="card-header"><a style="color:green">{{post.author_name}}</a> &nbsp&nbsp&nbsp Timestamp: {{post.timestamp}} &nbsp&nbsp&nbsp Subject:{{post.subject}}  &nbsp&nbsp&nbsp ID:{{post.id}}</div>
+	<div class="card-body">{% if post.image != 0 %}<img id="image" src="data:image/png;base64,{{post.image}}" width="200" height="128"/>{%- endif %} &nbsp {{post.comment}}</div>
+	<div class="card-footer">{% if post.comm_count != 0 %}{{post.comm_count}} Comments {% endif %}<div style="float:right;"><a href="javascript:BackEnd.open_post('{{post.id}}')"><button class="btn btn-sm">View thread</button></a></div></div>
+	</div></div><br>
+{%- endfor %}
 <center><h1><a id="loadposts" href="BackEnd.load_posts" data-bind="true">No posts :/</h1></a></center>
+{% elif mode == 'singlepost' %}
+<input type="text" form="form" name="thread" value="" style="display:none;">
+<div class="container">
+<div class="card">
+<div class="card-header bg-dark text-white"><a style="color:green">{{post.author}}</a> Timestamp: {{post.timestamp}} &nbsp&nbsp&nbsp Subject: {{post.subject}} &nbsp&nbsp&nbsp ID:{{post.id}}</div>
+<div class="card-body" align="center">{% if post.image != 0 %}<img id="image" src="data:image/png;base64,{{post.image}}" width="512" height="256" />{%- endif %} <br><br>{{post.comment}}</div>
 </div>
-
+<br><br>
+{% for post in post.replies %}
+	<div class="container">
+	<div class="card">
+	<div class="card-header"><a style="color:green">{{post.author_name}}</a> &nbsp&nbsp&nbsp Timestamp: {{post.timestamp}} &nbsp&nbsp&nbsp Subject:{{post.subject}}  &nbsp&nbsp&nbsp ID:{{post.id}}</div>
+	<div class="card-body">{% if post.image != 0 %}<img id="image" src="data:image/png;base64,{{post.image}}" width="200" height="128"/>{%- endif %} &nbsp {{post.comment}}</div>
+  </div></div><br>
+{% endfor %}
+{% else %}
+   <h1><center>Internal Error</h1></center>
+</div></div></div><br>;
+</div>
+{% endif %}
 
 
 </body>

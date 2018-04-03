@@ -14,6 +14,6 @@ app.bind(BackEnd(app))
 app.developer_mode = True
 
 
-app.template = ("index.html", {})
+app.template = ("index.html", {'mode':'posts'})
 
 app.start()
