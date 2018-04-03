@@ -7,9 +7,16 @@ import codecs
 from urllib.request import urlopen
 import sqlite3
 import os
+import sys
+hash_length = 32
 
-with open("config.json","r") as config:
-    database = json.loads(config.read())['database']
+if 'back_end' not in sys.modules:
+    print('Not running in client')
+else:
+    config = open("config.json","r")
+    config = json.load(config)
+    database = config['database']
+    hash_length = int(config['hash_len'])
     if os.path.isfile(database):
         conn = sqlite3.connect(database)
         db = conn.cursor()
@@ -38,7 +45,7 @@ def regkey_value(path, name="", start_key = None):
                 i += 1
             return desc[1]
 
-def make_hash(*args,length=32):
+def make_hash(*args,length=hash_length):
     tobehashed = ''
     for arg in args:
         tobehashed = tobehashed+str(arg)
@@ -184,7 +191,7 @@ class blockchan():
 
 
     def get_post(id):
-        db.execute("SELECT id,author_name,timestamp,subject,comment,image FROM posts WHERE id=?",(id,))
+        db.execute("SELECT id,author_name,timestamp,subject,comment,image,thread FROM posts WHERE id=?",(id,))
         res = db.fetchone()
         post = Post()
         post.id = res[0]
@@ -193,9 +200,18 @@ class blockchan():
         post.subject = res[3]
         post.comment = res[4]
         post.image = res[5]
+        post.thread = res[6]
         return post
 
 
-    def get_post_ids():
-        db.execute("SELECT id FROM posts")
-        return db.fetchall()
+    def get_post_ids(sort='desc'):
+        if sort == 'desc':
+            db.execute("SELECT id FROM posts WHERE thread=0 ORDER BY timestamp DESC")
+        elif sort == 'asc':
+            db.execute("SELECT id FROM posts WHERE thread=0 ORDER BY timestamp ASC")
+        else:
+            return 0
+        result = []
+        for res in db.fetchall():
+            result.append(res[0])
+        return result

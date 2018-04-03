@@ -3,6 +3,7 @@ import json
 from blockchan_utils import *
 import time
 
+
 with open('config.json',"r+") as conf_file:
     config = json.loads(conf_file.read())
     if config['user_id'] == 0:
@@ -15,7 +16,6 @@ with open('config.json',"r+") as conf_file:
     else:
         user_id = config['user_id']
         conf_file.close()
-
 
 
 class BackEnd(htmlPy.Object):
