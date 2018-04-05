@@ -1,5 +1,6 @@
 import base64
 from datetime import datetime
+import time
 import json
 import hashlib
 import winreg
@@ -12,6 +13,18 @@ hash_length = 32
 
 if 'back_end' not in sys.modules:
     print('Not running in client')
+    with open('server_cfg.json',"r+") as conf_file:
+        config = json.loads(conf_file.read())
+        database = config['database']
+        if os.path.isfile(database):
+            conn = sqlite3.connect(database, check_same_thread=False)
+            db = conn.cursor()
+        else:
+            conn = sqlite3.connect(database)
+            db = conn.cursor()
+            db.execute("CREATE TABLE posts (thread,author_name,id,timestamp,subject,comment,image)")
+            db.execute("CREATE TABLE users (username,id,ip_addr,reg_date)")
+            db.execute("CREATE TABLE sessions (bid,sid,time,invalid)")
 else:
     config = open("config.json","r")
     config = json.load(config)
@@ -56,6 +69,8 @@ def make_hash(*args,length=hash_length):
 def get_timestamp():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+def get_epoch():
+    return int(time.time())
 
 def get_user_id():
     regkey = regkey_value("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion","ProductId")
